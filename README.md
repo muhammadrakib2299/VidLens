@@ -7,6 +7,8 @@ frames to Claude for vision analysis, and writes a searchable report.
 This is the working backend for the VidLens design mockups
 (`VidLens App.dc.html`, `VidLens Report.dc.html`).
 
+![VidLens analysis report](docs/screenshot.png)
+
 ## Pipeline
 
 ```
