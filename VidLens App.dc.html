@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#0B0E13;}
+  a{color:#E8A33D;text-decoration:none;} a:hover{color:#F2BE6A;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  ::selection{background:#E8A33D;color:#0B0E13;}
+</style>
+</helmet>
+
+<div data-screen-label="VidLens App" style="font-family:'Space Grotesk',sans-serif; color:#E6E9EF; background:#0B0E13; min-height:100vh; display:flex; flex-direction:column;">
+
+  <!-- Title bar -->
+  <div style="height:44px; background:#11151C; border-bottom:1px solid #1E2530; display:flex; align-items:center; padding:0 16px; gap:12px; flex-shrink:0;">
+    <div style="width:22px; height:22px; background:#E8A33D; display:grid; place-items:center; font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; color:#0B0E13;">▶</div>
+    <div style="font-weight:600; font-size:14px; letter-spacing:.04em;">VIDLENS</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675;">v0.1 · local · {{ modelLabel }}</div>
+    <div style="flex:1;"></div>
+    <div style="display:flex; gap:6px; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675;">
+      <div style="width:7px; height:7px; border-radius:50%; background:#4CC38A;"></div>
+      API key loaded
+    </div>
+    <div style="display:flex; gap:8px; margin-left:12px;">
+      <div style="width:12px;height:12px;border-radius:2px;border:1px solid #3A4454;"></div>
+      <div style="width:12px;height:12px;border-radius:2px;border:1px solid #3A4454;"></div>
+      <div style="width:12px;height:12px;border-radius:2px;border:1px solid #3A4454;background:#3A4454;"></div>
+    </div>
+  </div>
+
+  <div style="display:flex; flex:1; min-height:0;">
+
+    <!-- Sidebar -->
+    <div style="width:190px; background:#0E1218; border-right:1px solid #1E2530; padding:20px 12px; display:flex; flex-direction:column; gap:4px; flex-shrink:0;">
+      <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="3">
+        <button onClick="{{ nav.go }}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; background: {{ nav.bg }}; color: {{ nav.color }}; border:none; border-left:2px solid {{ nav.edge }}; text-align:left; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:500; cursor:pointer; letter-spacing:.02em;" style-hover="color:#E6E9EF; background:#151B24;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; width:16px;">{{ nav.glyph }}</span>
+          {{ nav.label }}
+        </button>
+      </sc-for>
+      <div style="flex:1;"></div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3A4454; padding:0 12px; line-height:1.7;">
+        jobs dir: ./jobs<br>whisper: base int8<br>ffmpeg: 6.1.1 ✓
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div style="flex:1; min-width:0; overflow-y:auto; position:relative;">
+
+      <!-- ===== NEW JOB ===== -->
+      <sc-if value="{{ isNew }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="New Job" style="max-width:720px; margin:0 auto; padding:48px 40px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; letter-spacing:.15em; margin-bottom:8px;">NEW JOB</div>
+        <h1 style="margin:0 0 32px; font-size:28px; font-weight:600; letter-spacing:-.01em;">Analyze a video</h1>
+
+        <!-- Input mode toggle -->
+        <div style="display:flex; gap:0; margin-bottom:16px; border:1px solid #1E2530; width:fit-content;">
+          <button onClick="{{ setModeFile }}" style="padding:10px 20px; border:none; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.05em; background:{{ fileTabBg }}; color:{{ fileTabColor }};">LOCAL FILE</button>
+          <button onClick="{{ setModeUrl }}" style="padding:10px 20px; border:none; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.05em; background:{{ urlTabBg }}; color:{{ urlTabColor }};">YOUTUBE URL</button>
+        </div>
+
+        <!-- Drop zone / URL input -->
+        <sc-if value="{{ isFileInput }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ pickFile }}" style="border:1px dashed #3A4454; background:#0E1218; padding:36px; text-align:center; cursor:pointer; margin-bottom:24px;" style-hover="border-color:#E8A33D; background:#12161F;">
+            <sc-if value="{{ hasFile }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#E6E9EF;">{{ fileName }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; margin-top:8px;">{{ fileMeta }}</div>
+            </sc-if>
+            <sc-if value="{{ noFile }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:15px; color:#8A94A6;">Drop a video here or click to browse</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; margin-top:8px;">mp4 · avi · mkv · dav — up to 80 min</div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isUrlInput }}" hint-placeholder-val="{{ false }}">
+          <input value="{{ url }}" onChange="{{ setUrl }}" placeholder="https://youtube.com/watch?v=…" style="width:100%; box-sizing:border-box; background:#0E1218; border:1px solid #3A4454; color:#E6E9EF; padding:14px 16px; font-family:'IBM Plex Mono',monospace; font-size:13px; margin-bottom:24px; outline:none;" style-focus="border-color:#E8A33D;">
+        </sc-if>
+
+        <!-- Detection mode -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px;">
+          <sc-for list="{{ detModes }}" as="dm" hint-placeholder-count="3">
+            <button onClick="{{ dm.pick }}" style="padding:14px; background:{{ dm.bg }}; border:1px solid {{ dm.border }}; cursor:pointer; text-align:left; color:#E6E9EF;" style-hover="border-color:#E8A33D;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ dm.tagColor }}; letter-spacing:.1em; margin-bottom:6px;">{{ dm.tag }}</div>
+              <div style="font-size:12px; color:#8A94A6; line-height:1.4;">{{ dm.desc }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- Custom question -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; letter-spacing:.1em; margin-bottom:8px;">CUSTOM QUESTION <span style="color:#3A4454;">— optional</span></div>
+          <input value="{{ question }}" onChange="{{ setQuestion }}" placeholder='e.g. "look for a white van"' style="width:100%; box-sizing:border-box; background:#0E1218; border:1px solid #1E2530; color:#E6E9EF; padding:12px 16px; font-family:'Space Grotesk',sans-serif; font-size:14px; outline:none;" style-focus="border-color:#E8A33D;">
+        </div>
+
+        <!-- Model row -->
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:36px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; letter-spacing:.1em;">MODEL</div>
+          <button onClick="{{ setHaiku }}" style="padding:8px 16px; border:1px solid {{ haikuBorder }}; background:{{ haikuBg }}; color:#E6E9EF; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px;">haiku <span style="color:#5C6675;">default</span></button>
+          <button onClick="{{ setSonnet }}" style="padding:8px 16px; border:1px solid {{ sonnetBorder }}; background:{{ sonnetBg }}; color:#E6E9EF; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px;">sonnet <span style="color:#5C6675;">hard cases</span></button>
+        </div>
+
+        <button onClick="{{ estimate }}" style="padding:14px 32px; background:#E8A33D; color:#0B0E13; border:none; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; cursor:pointer; letter-spacing:.02em;" style-hover="background:#F2BE6A;">Estimate cost →</button>
+      </div>
+      </sc-if>
+
+      <!-- ===== RUNNING ===== -->
+      <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Pipeline Progress" style="max-width:720px; margin:0 auto; padding:48px 40px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; letter-spacing:.15em; margin-bottom:8px;">JOB 2026-07-06_cctv01</div>
+        <h1 style="margin:0 0 8px; font-size:28px; font-weight:600;">{{ runTitle }}</h1>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5C6675; margin-bottom:36px;">{{ runSubtitle }}</div>
+
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <sc-for list="{{ stages }}" as="st" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:28px 160px 1fr 90px; align-items:center; gap:16px; padding:14px 16px; background:{{ st.bg }}; border-left:2px solid {{ st.edge }};">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ st.iconColor }}; animation:{{ st.anim }};">{{ st.icon }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ st.nameColor }}; letter-spacing:.05em;">{{ st.name }}</div>
+              <div style="height:3px; background:#1E2530; position:relative;">
+                <div style="position:absolute; inset:0; width:{{ st.pct }}%; background:{{ st.barColor }}; transition:width .3s;"></div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; text-align:right;">{{ st.detail }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- log -->
+        <div style="margin-top:24px; background:#080A0E; border:1px solid #1E2530; padding:16px 20px; font-family:'IBM Plex Mono',monospace; font-size:11px; line-height:1.9; color:#5C6675; height:120px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end;">
+          <sc-for list="{{ logLines }}" as="line" hint-placeholder-count="4">
+            <div>{{ line }}</div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:32px; display:flex; gap:12px; align-items:center;">
+            <button onClick="{{ openReport }}" style="padding:14px 32px; background:#4CC38A; color:#0B0E13; border:none; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; cursor:pointer;" style-hover="background:#6ED3A2;">Open report →</button>
+            <button onClick="{{ resetJob }}" style="padding:14px 24px; background:transparent; color:#8A94A6; border:1px solid #3A4454; font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:14px; cursor:pointer;" style-hover="border-color:#8A94A6; color:#E6E9EF;">New job</button>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675;">actual cost: $0.11 · 4m 32s</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ resetJob }}" style="margin-top:32px; padding:10px 20px; background:transparent; color:#5C6675; border:1px solid #1E2530; font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer;" style-hover="color:#D9534F; border-color:#D9534F;">ABORT — stages cached, safe to resume</button>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== BATCH ===== -->
+      <sc-if value="{{ isBatch }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Batch Mode" style="max-width:820px; margin:0 auto; padding:48px 40px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; letter-spacing:.15em; margin-bottom:8px;">BATCH MODE</div>
+        <h1 style="margin:0 0 8px; font-size:28px; font-weight:600;">Overnight queue</h1>
+        <div style="font-size:14px; color:#8A94A6; margin-bottom:32px;">Folder: <span style="font-family:'IBM Plex Mono',monospace; color:#E6E9EF;">D:\cctv\2026-07-05\</span> — 6 files · est. total <span style="color:#E8A33D; font-family:'IBM Plex Mono',monospace;">$0.68</span></div>
+
+        <div style="display:flex; flex-direction:column; gap:2px; margin-bottom:28px;">
+          <sc-for list="{{ batchJobs }}" as="bj" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:28px 1fr 90px 110px 90px; align-items:center; gap:16px; padding:13px 16px; background:#0E1218; border-left:2px solid {{ bj.edge }};">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:{{ bj.statusColor }};">{{ bj.icon }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#E6E9EF;">{{ bj.file }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; text-align:right;">{{ bj.dur }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:{{ bj.statusColor }}; text-align:right;">{{ bj.status }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; text-align:right;">{{ bj.cost }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+          <button style="padding:12px 28px; background:#E8A33D; color:#0B0E13; border:none; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="background:#F2BE6A;">Run queue overnight</button>
+          <button style="padding:12px 20px; background:transparent; color:#8A94A6; border:1px solid #3A4454; font-size:14px; font-family:'Space Grotesk',sans-serif; cursor:pointer;" style-hover="color:#E6E9EF; border-color:#8A94A6;">Add folder…</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== JOBS HISTORY ===== -->
+      <sc-if value="{{ isJobs }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Job History" style="max-width:820px; margin:0 auto; padding:48px 40px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; letter-spacing:.15em; margin-bottom:8px;">HISTORY</div>
+        <h1 style="margin:0 0 32px; font-size:28px; font-weight:600;">Completed jobs</h1>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <sc-for list="{{ historyJobs }}" as="hj" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:1fr 100px 80px 110px; align-items:center; gap:16px; padding:15px 16px; background:#0E1218; border-left:2px solid #1E2530; cursor:pointer;" style-hover="background:#12161F; border-left-color:#E8A33D;">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#E6E9EF;">{{ hj.name }}</div>
+                <div style="font-size:12px; color:#5C6675; margin-top:3px;">{{ hj.summary }}</div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; text-align:right;">{{ hj.frames }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5C6675; text-align:right;">{{ hj.cost }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; text-align:right;">report.md →</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== COST MODAL ===== -->
+      <sc-if value="{{ showCost }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; inset:0; background:rgba(4,6,10,.75); display:grid; place-items:center; z-index:10;">
+        <div data-screen-label="Cost Guard" style="width:440px; background:#11151C; border:1px solid #3A4454; padding:32px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#E8A33D; letter-spacing:.15em; margin-bottom:12px;">COST GUARD</div>
+          <div style="font-size:22px; font-weight:600; margin-bottom:24px;">Estimated <span style="font-family:'IBM Plex Mono',monospace; color:#E8A33D;">$0.12</span> for this job</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8A94A6; margin-bottom:28px;">
+            <div style="display:flex; justify-content:space-between;"><span>key frames</span><span style="color:#E6E9EF;">142</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>batches to Claude</span><span style="color:#E6E9EF;">8 × ~18 frames</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>transcript tokens</span><span style="color:#E6E9EF;">~11,400</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>model</span><span style="color:#E6E9EF;">{{ modelLabel }}</span></div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button onClick="{{ confirmRun }}" style="flex:1; padding:13px; background:#E8A33D; color:#0B0E13; border:none; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="background:#F2BE6A;">Proceed [Y]</button>
+            <button onClick="{{ cancelCost }}" style="flex:1; padding:13px; background:transparent; color:#8A94A6; border:1px solid #3A4454; font-family:'Space Grotesk',sans-serif; font-size:14px; cursor:pointer;" style-hover="color:#E6E9EF;">Cancel [N]</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'new',          // new | running | batch | jobs
+    inputMode: 'file',
+    hasFile: false,
+    url: '',
+    detMode: 'auto',
+    question: '',
+    model: 'haiku',
+    showCost: false,
+    // pipeline simulation
+    stageIdx: -1,           // -1 not started; index of active stage
+    stagePct: 0,
+    done: false,
+    logLines: ['[ready] waiting for job…'],
+  };
+
+  STAGE_DEFS = [
+    { name: 'DOWNLOAD',   detail: 'skipped (local)', skip: true },
+    { name: 'PROBE',      detail: 'ffprobe' },
+    { name: 'FRAMES',     detail: 'motion detect' },
+    { name: 'DEDUPE',     detail: 'phash' },
+    { name: 'TRANSCRIBE', detail: 'no audio — skip', skip: true },
+    { name: 'ANALYZE',    detail: 'claude api' },
+    { name: 'REPORT',     detail: 'report.md' },
+  ];
+
+  LOG_POOL = [
+    '[probe] 78:14 duration · 1920x1080 · 12.4 GB · no audio track',
+    '[frames] motion threshold 0.32 — scanning…',
+    '[frames] 214 candidate frames extracted',
+    '[dedupe] phash distance < 6 — dropped 72 near-duplicates',
+    '[dedupe] 142 key frames kept, timestamped',
+    '[transcribe] no audio track — stage skipped',
+    '[analyze] batch 1/8 → claude-haiku … ok (3.1s)',
+    '[analyze] batch 2/8 → claude-haiku … ok (2.8s)',
+    '[analyze] batch 3/8 → claude-haiku … ok (3.4s)',
+    '[analyze] batch 4/8 → flagged: person at gate 00:42:17',
+    '[analyze] batch 5/8 → claude-haiku … ok (2.9s)',
+    '[analyze] batch 6/8 → claude-haiku … ok (3.0s)',
+    '[analyze] batch 7/8 → claude-haiku … ok (3.2s)',
+    '[analyze] batch 8/8 → claude-haiku … ok (2.7s)',
+    '[report] merging timeline + summary → report.md',
+    '[done] job complete — cached to ./jobs/2026-07-06_cctv01',
+  ];
+
+  componentWillUnmount() { clearInterval(this._t); }
+
+  startPipeline = () => {
+    clearInterval(this._t);
+    let logIdx = 0;
+    this.setState({ screen: 'running', showCost: false, stageIdx: 0, stagePct: 0, done: false, logLines: ['[start] job 2026-07-06_cctv01'] });
+    this._t = setInterval(() => {
+      this.setState(s => {
+        let { stageIdx, stagePct, logLines, done } = s;
+        if (done) return null;
+        const def = this.STAGE_DEFS[stageIdx];
+        stagePct += def && def.skip ? 100 : (12 + Math.random() * 18);
+        if (stagePct >= 100) {
+          stagePct = 0;
+          stageIdx += 1;
+          if (logIdx < this.LOG_POOL.length) logLines = [...logLines, this.LOG_POOL[logIdx++]].slice(-6);
+          if (stageIdx >= this.STAGE_DEFS.length) {
+            clearInterval(this._t);
+            return { done: true, stageIdx: this.STAGE_DEFS.length, stagePct: 0, logLines: [...logLines, '[done] report ready — $0.11 actual'].slice(-6) };
+          }
+        } else if (Math.random() < 0.35 && logIdx < this.LOG_POOL.length) {
+          logLines = [...logLines, this.LOG_POOL[logIdx++]].slice(-6);
+        }
+        return { stageIdx, stagePct, logLines };
+      });
+    }, 420);
+  };
+
+  renderVals() {
+    const s = this.state;
+    const go = (screen) => () => this.setState({ screen });
+    const AMBER = '#E8A33D', DIM = '#5C6675', OK = '#4CC38A';
+
+    const navDefs = [
+      { key: 'new',     label: 'New Job',  glyph: '+' },
+      { key: 'running', label: 'Pipeline', glyph: '»' },
+      { key: 'batch',   label: 'Batch',    glyph: '≡' },
+      { key: 'jobs',    label: 'History',  glyph: '◷' },
+    ];
+    const navItems = navDefs.map(n => {
+      const active = s.screen === n.key;
+      return { ...n, go: go(n.key), bg: active ? '#151B24' : 'transparent', color: active ? '#E6E9EF' : '#8A94A6', edge: active ? AMBER : 'transparent' };
+    });
+
+    const detDefs = [
+      { key: 'auto',   tag: 'AUTO DETECT', desc: 'Sniffs CCTV vs normal footage from metadata' },
+      { key: 'cctv',   tag: 'CCTV',        desc: 'Motion detection via OpenCV, tuned for static cams' },
+      { key: 'normal', tag: 'NORMAL',      desc: 'Scene-change detection for edited video' },
+    ];
+    const detModes = detDefs.map(d => {
+      const active = s.detMode === d.key;
+      return { ...d, pick: () => this.setState({ detMode: d.key }), bg: active ? '#151B24' : '#0E1218', border: active ? AMBER : '#1E2530', tagColor: active ? AMBER : DIM };
+    });
+
+    // pipeline stages view-model
+    const stages = this.STAGE_DEFS.map((def, i) => {
+      const state = s.stageIdx > i || s.done ? 'done' : s.stageIdx === i ? 'active' : 'pending';
+      const skipped = def.skip && state === 'done';
+      return {
+        name: def.name,
+        detail: def.detail,
+        icon: state === 'done' ? (skipped ? '–' : '✓') : state === 'active' ? '●' : '○',
+        iconColor: state === 'done' ? (skipped ? DIM : OK) : state === 'active' ? AMBER : '#3A4454',
+        anim: state === 'active' ? 'pulse 1.2s infinite' : 'none',
+        nameColor: state === 'pending' ? DIM : '#E6E9EF',
+        pct: state === 'done' ? 100 : state === 'active' ? Math.min(99, Math.round(s.stagePct)) : 0,
+        barColor: state === 'done' ? (skipped ? '#3A4454' : OK) : AMBER,
+        bg: state === 'active' ? '#12161F' : '#0E1218',
+        edge: state === 'active' ? AMBER : state === 'done' ? '#1E2530' : 'transparent',
+      };
+    });
+
+    const batchJobs = [
+      { file: 'cam01_0000-0600.dav', dur: '6:00:00', status: 'QUEUED',  cost: '$0.14', icon: '○', statusColor: DIM, edge: 'transparent' },
+      { file: 'cam01_0600-1200.dav', dur: '6:00:00', status: 'QUEUED',  cost: '$0.14', icon: '○', statusColor: DIM, edge: 'transparent' },
+      { file: 'cam02_0000-0600.dav', dur: '6:00:00', status: 'QUEUED',  cost: '$0.12', icon: '○', statusColor: DIM, edge: 'transparent' },
+      { file: 'cam02_0600-1200.dav', dur: '6:00:00', status: 'QUEUED',  cost: '$0.12', icon: '○', statusColor: DIM, edge: 'transparent' },
+      { file: 'gate_west_full.mkv',  dur: '1:20:00', status: 'CACHED',  cost: '$0.09', icon: '◐', statusColor: AMBER, edge: AMBER },
+      { file: 'driveway_night.mp4',  dur: '0:47:12', status: 'DONE',    cost: '$0.07', icon: '✓', statusColor: OK, edge: OK },
+    ];
+
+    const historyJobs = [
+      { name: '2026-07-06_cctv01', summary: 'Person at gate 00:42:17 · 3 vehicles · nothing after midnight', frames: '142 frames', cost: '$0.11' },
+      { name: '2026-07-04_yt-lecture', summary: 'Lecture on distributed systems — 14 topic segments', frames: '87 frames', cost: '$0.06' },
+      { name: '2026-07-02_driveway', summary: 'White van 14:03:22 → matched custom question', frames: '96 frames', cost: '$0.08' },
+      { name: '2026-06-29_cam02', summary: 'No unusual activity flagged', frames: '58 frames', cost: '$0.05' },
+    ];
+
+    return {
+      // nav / screens
+      navItems,
+      isNew: s.screen === 'new',
+      isRunning: s.screen === 'running',
+      isBatch: s.screen === 'batch',
+      isJobs: s.screen === 'jobs',
+      // input
+      setModeFile: () => this.setState({ inputMode: 'file' }),
+      setModeUrl: () => this.setState({ inputMode: 'url' }),
+      isFileInput: s.inputMode === 'file',
+      isUrlInput: s.inputMode === 'url',
+      fileTabBg: s.inputMode === 'file' ? '#E8A33D' : 'transparent',
+      fileTabColor: s.inputMode === 'file' ? '#0B0E13' : '#8A94A6',
+      urlTabBg: s.inputMode === 'url' ? '#E8A33D' : 'transparent',
+      urlTabColor: s.inputMode === 'url' ? '#0B0E13' : '#8A94A6',
+      pickFile: () => this.setState({ hasFile: !s.hasFile }),
+      hasFile: s.hasFile, noFile: !s.hasFile,
+      fileName: 'gate_west_2026-07-05.dav',
+      fileMeta: '78:14 · 1920×1080 · 12.4 GB · no audio track → CCTV mode likely',
+      url: s.url,
+      setUrl: (e) => this.setState({ url: e.target.value }),
+      detModes,
+      question: s.question,
+      setQuestion: (e) => this.setState({ question: e.target.value }),
+      setHaiku: () => this.setState({ model: 'haiku' }),
+      setSonnet: () => this.setState({ model: 'sonnet' }),
+      haikuBorder: s.model === 'haiku' ? AMBER : '#1E2530',
+      haikuBg: s.model === 'haiku' ? '#151B24' : 'transparent',
+      sonnetBorder: s.model === 'sonnet' ? AMBER : '#1E2530',
+      sonnetBg: s.model === 'sonnet' ? '#151B24' : 'transparent',
+      modelLabel: s.model === 'haiku' ? 'claude-haiku' : 'claude-sonnet',
+      // cost modal
+      estimate: () => this.setState({ showCost: true }),
+      showCost: s.showCost,
+      cancelCost: () => this.setState({ showCost: false }),
+      confirmRun: this.startPipeline,
+      // running
+      stages,
+      logLines: s.logLines,
+      isDone: s.done, notDone: !s.done && s.stageIdx >= 0,
+      runTitle: s.done ? 'Analysis complete' : s.stageIdx < 0 ? 'No job running' : 'Processing gate_west_2026-07-05.dav',
+      runSubtitle: s.done ? '142 frames analyzed · report.md written to ./jobs/2026-07-06_cctv01' : 'stages cached to disk — safe to interrupt and resume',
+      openReport: () => { window.location.href = 'VidLens Report.dc.html'; },
+      resetJob: () => { clearInterval(this._t); this.setState({ screen: 'new', stageIdx: -1, stagePct: 0, done: false, logLines: ['[ready] waiting for job…'] }); },
+      // batch + history
+      batchJobs,
+      historyJobs,
+    };
+  }
+}
+</script>
+</body>
+</html>

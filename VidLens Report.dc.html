@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#F5F4EF;}
+  a{color:#B26A0F;text-decoration:none;} a:hover{color:#D08A1E;}
+  ::selection{background:#E8A33D;color:#1A1D23;}
+</style>
+</helmet>
+
+<div data-screen-label="VidLens Report" style="font-family:'Space Grotesk',sans-serif; color:#1A1D23; background:#F5F4EF; min-height:100vh;">
+
+  <!-- Header -->
+  <div style="border-bottom:1px solid #E4E1D8; background:#FFFFFF;">
+    <div style="max-width:960px; margin:0 auto; padding:36px 40px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <a href="VidLens App.dc.html" style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484; letter-spacing:.1em;">← VIDLENS</a>
+        <div style="flex:1;"></div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484;">./jobs/2026-07-06_cctv01/report.md</div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#B26A0F; letter-spacing:.15em; margin-bottom:8px;">ANALYSIS REPORT</div>
+      <h1 style="margin:0 0 20px; font-size:30px; font-weight:600; letter-spacing:-.01em;">gate_west_2026-07-05.dav</h1>
+      <div style="display:flex; flex-wrap:wrap; gap:28px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484;">
+        <div>DURATION <span style="color:#1A1D23;">78:14</span></div>
+        <div>MODE <span style="color:#1A1D23;">CCTV / motion</span></div>
+        <div>FRAMES <span style="color:#1A1D23;">142 kept / 214 raw</span></div>
+        <div>AUDIO <span style="color:#1A1D23;">none</span></div>
+        <div>MODEL <span style="color:#1A1D23;">claude-haiku</span></div>
+        <div>COST <span style="color:#B26A0F;">$0.11</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:960px; margin:0 auto; padding:40px;">
+
+    <!-- Summary -->
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:48px;">
+      <div style="background:#FFFFFF; border:1px solid #E4E1D8; padding:28px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484; letter-spacing:.15em; margin-bottom:14px;">SUMMARY</div>
+        <p style="margin:0; font-size:15px; line-height:1.7; color:#40454F; text-wrap:pretty;">Quiet overnight footage of the west gate. Three vehicle passes between 18:20 and 19:45, all consistent with residents. One pedestrian approaches the gate at <a href="#ev-4217">00:42:17</a>, pauses ~40 seconds looking at the keypad, then leaves on foot — flagged as unusual. No activity after 01:10. No white van observed (custom question).</p>
+      </div>
+      <div style="background:#FDF3E0; border:1px solid #EBCF94; padding:28px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#B26A0F; letter-spacing:.15em; margin-bottom:14px;">⚑ FLAGGED — 1</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#B26A0F; margin-bottom:6px;"><a href="#ev-4217">00:42:17</a></div>
+        <div style="font-size:13px; line-height:1.6; color:#6B5836;">Unidentified person lingers at gate keypad for ~40s, no entry attempt, leaves north on foot.</div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484; letter-spacing:.15em; margin-bottom:20px;">EVENT TIMELINE</div>
+    <div style="display:flex; flex-direction:column; gap:2px; margin-bottom:48px;">
+      <sc-for list="{{ events }}" as="ev" hint-placeholder-count="7">
+        <div id="{{ ev.anchor }}" style="display:grid; grid-template-columns:120px 1fr 148px; gap:20px; align-items:center; padding:16px 20px; background:{{ ev.bg }}; border-left:2px solid {{ ev.edge }};">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ ev.tsColor }};">{{ ev.ts }}</div>
+          <div>
+            <div style="font-size:14px; color:#1A1D23; margin-bottom:3px;">{{ ev.title }}</div>
+            <div style="font-size:12px; color:#6E6A5E; line-height:1.5;">{{ ev.desc }}</div>
+          </div>
+          <div style="width:148px; height:84px; background:linear-gradient(135deg,#EFEDE6,#F7F6F1); border:1px solid #E4E1D8; display:grid; place-items:center; cursor:pointer;" style-hover="border-color:#E8A33D;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#A8A395; text-align:center; line-height:1.6;">{{ ev.frame }}<br>▸ view frame</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- Transcript -->
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A9484; letter-spacing:.15em; margin-bottom:20px;">TRANSCRIPT</div>
+    <div style="background:#FFFFFF; border:1px solid #E4E1D8; padding:24px 28px; margin-bottom:48px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#9A9484; line-height:1.8;">— no audio track detected · transcription stage skipped —</div>
+    </div>
+
+    <div style="display:flex; gap:24px; padding-bottom:64px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#A8A395;">
+      <div>generated 2026-07-06 07:14 · vidlens v0.1</div>
+      <div style="flex:1;"></div>
+      <div>raw responses cached → analysis.json</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const AMBER = '#B26A0F', DIM = '#9A9484';
+    const mk = (ts, title, desc, opts = {}) => ({
+      ts, title, desc,
+      anchor: 'ev-' + ts.replace(/:/g, '').slice(2),
+      frame: 'frame_' + ts.replace(/:/g, '') + '.jpg',
+      tsColor: opts.flag ? AMBER : DIM,
+      bg: opts.flag ? '#FDF3E0' : '#FFFFFF',
+      edge: opts.flag ? '#E8A33D' : '#E4E1D8',
+    });
+    return {
+      events: [
+        mk('00:00:00', 'Recording starts', 'Static view of west gate, dusk lighting. Gate closed.'),
+        mk('00:18:23', 'Vehicle pass — grey SUV', 'Enters via gate using remote; plate partially visible.'),
+        mk('00:31:40', 'Vehicle pass — hatchback', 'Exits through gate, normal speed.'),
+        mk('00:42:17', 'Person at gate — FLAGGED', 'Individual approaches on foot, examines keypad ~40s, no entry attempt, departs north.', { flag: true }),
+        mk('00:57:02', 'Vehicle pass — grey SUV', 'Same SUV as 00:18:23 exits.'),
+        mk('01:09:48', 'Cat crosses driveway', 'Small animal, motion trigger only.'),
+        mk('01:10:00', 'No further activity', 'Remaining 68 minutes static — 9 frames retained as periodic checks.'),
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

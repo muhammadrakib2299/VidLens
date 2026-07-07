@@ -1,0 +1,19 @@
+# Core (needed for cost estimation, dedupe, report)
+numpy>=1.24
+pillow>=10.0
+imagehash>=4.3
+
+# Frame extraction / motion + scene detection
+opencv-python-headless>=4.9
+
+# Claude vision analysis
+anthropic>=0.40
+
+# Optional — audio transcription (skip if you only analyse CCTV/no-audio video)
+faster-whisper>=1.0
+
+# Optional — YouTube / remote URL input
+yt-dlp>=2024.1
+
+# External binary (NOT pip-installable): ffmpeg + ffprobe must be on PATH.
+#   Windows: https://ffmpeg.org/download.html  or  winget install Gyan.FFmpeg
