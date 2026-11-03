@@ -19,7 +19,6 @@ def run(job, log) -> None:
     deps.require("cv2", "pip install opencv-python-headless")
     deps.require("numpy", "pip install numpy")
     import cv2
-    import numpy as np
 
     meta = job.read_json("probe.json")
     detection = meta.get("detection", config.DEFAULT_DETECTION)

@@ -10,7 +10,7 @@ import base64
 import html
 from pathlib import Path
 
-from ..util import fmt_ts, human_size
+from ..util import fmt_ts
 
 
 # ---------------------------------------------------------------------------
@@ -175,6 +175,6 @@ def run(job, log) -> None:
     meta, analysis = _load(job)
     _write_markdown(job, meta, analysis)
     _write_html(job, meta, analysis)
-    log(f"[report] merging timeline + summary -> report.md, report.html")
+    log("[report] merging timeline + summary -> report.md, report.html")
     log(f"[done] job complete — cached to {job.dir}")
     job.mark("report", "done")

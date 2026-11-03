@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-smoke:
+    name: Lint & smoke test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package
+        run: pip install . ruff
+      - name: Ruff
+        run: ruff check vidlens
+      - name: Byte-compile
+        run: python -m compileall -q vidlens
+      - name: CLI smoke test (no API key or ffmpeg needed)
+        run: |
+          vidlens --help
+          vidlens --version
+          vidlens estimate --frames 142 --model haiku

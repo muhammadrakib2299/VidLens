@@ -1,11 +1,14 @@
 # VidLens
 
+[![CI](https://github.com/muhammadrakib2299/VidLens/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammadrakib2299/VidLens/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Local video-analysis pipeline. Point it at a video (local file or YouTube URL)
 and it extracts key frames, de-duplicates them, transcribes audio, sends the
 frames to Claude for vision analysis, and writes a searchable report.
 
 This is the working backend for the VidLens design mockups
-(`VidLens App.dc.html`, `VidLens Report.dc.html`).
+([`design/VidLens App.dc.html`](design/), [`design/VidLens Report.dc.html`](design/)).
 
 ![VidLens analysis report](docs/screenshot.png)
 
@@ -23,7 +26,10 @@ redo them).
 ## Install
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt          # everything, run with: python -m vidlens ...
+# or install as a CLI (adds the `vidlens` command):
+pip install ".[all]"                      # core + Whisper + yt-dlp
+pip install .                             # core only (no transcription / YouTube)
 ```
 
 Plus **ffmpeg/ffprobe** on your PATH (not pip-installable):

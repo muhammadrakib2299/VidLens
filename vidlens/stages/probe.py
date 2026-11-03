@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import subprocess
 
-from .. import config, deps
+from .. import deps
 from ..util import human_size
 
 

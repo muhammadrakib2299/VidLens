@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vidlens"
+dynamic = ["version"]
+description = "Local video-analysis pipeline: key frames, de-duplication, Whisper transcription and Claude vision analysis into a searchable report."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Md. Rakib", email = "muhammad.rakib2299@gmail.com" }]
+requires-python = ">=3.10"
+keywords = ["video-analysis", "claude", "whisper", "opencv", "computer-vision", "cctv"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Topic :: Multimedia :: Video",
+]
+dependencies = [
+  "numpy>=1.24",
+  "pillow>=10.0",
+  "imagehash>=4.3",
+  "opencv-python-headless>=4.9",
+  "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+transcribe = ["faster-whisper>=1.0"]
+youtube = ["yt-dlp>=2024.1"]
+all = ["faster-whisper>=1.0", "yt-dlp>=2024.1"]
+
+[project.scripts]
+vidlens = "vidlens.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/muhammadrakib2299/VidLens"
+Repository = "https://github.com/muhammadrakib2299/VidLens"
+
+[tool.setuptools.dynamic]
+version = { attr = "vidlens.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["vidlens*"]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
