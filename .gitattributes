@@ -1,0 +1,3 @@
+# Design mockups are exported HTML/JS, not part of the Python package —
+# keep them out of GitHub's language statistics.
+design/** linguist-documentation
